@@ -90,24 +90,29 @@ class EmployeeDirApp {
     generateCards = (filterText) => {
 
         if (this.data) {
-            this.filteredData = this.data.filter(s => s.name.first.toLowerCase().indexOf(filterText.toLowerCase()) > -1)
-            const cards = this.filteredData.map(user => {
-                return `
-                    <div class="card" id="${user.login.uuid}" onclick='window.EmployeeJS.selectCard(this)'>
-                        <div class="card-img-container">
-                            <img class="card-img" src="${user.picture.medium}" alt="profile picture">
+            this.filteredData = this.data.filter(s => s.name.first.toLowerCase().indexOf(filterText.toLowerCase()) > -1);
+            if(this.filteredData.length === 0) {
+                this.galleryEl.innerHTML = '<h4>No User(s) Found</h4>';
+            } else {
+                const cards = this.filteredData.map(user => {
+                    return `
+                        <div class="card" id="${user.login.uuid}" onclick='window.EmployeeJS.selectCard(this)'>
+                            <div class="card-img-container">
+                                <img class="card-img" src="${user.picture.medium}" alt="profile picture">
+                            </div>
+                            <div class="card-info-container">
+                                <h3 id="name" class="card-name cap">${user.name.first} ${user.name.last}</h3>
+                                <p class="card-text">${user.email}</p>
+                                <p class="card-text cap">${user.location.city}, ${user.location.state}</p>
+                            </div>
                         </div>
-                        <div class="card-info-container">
-                            <h3 id="name" class="card-name cap">${user.name.first} ${user.name.last}</h3>
-                            <p class="card-text">${user.email}</p>
-                            <p class="card-text cap">${user.location.city}, ${user.location.state}</p>
-                        </div>
-                    </div>
-                `;
-            });
-
-            let galleryCards = cards.join('');
-            this.galleryEl.innerHTML = galleryCards;
+                    `;
+                });
+    
+                let galleryCards = cards.join('');
+                this.galleryEl.innerHTML = galleryCards;
+            }
+            
         }
     }
 
@@ -130,12 +135,11 @@ class EmployeeDirApp {
                 this.activeEmployeeInfo = this.filteredData[this.filteredData.findIndex(d => d.login.uuid === el.getAttribute('id'))];
             }
 
-
             this.generateModal();
+
         } catch (error) {
             this.modalCreationError = error;
-            console.log("err: ", error);
-            console.log("data: ", el.getAttribute("data-user"));
+            console.warn("Select Card - Err: ", error);
         }
 
     }
@@ -237,9 +241,7 @@ class EmployeeDirApp {
      * @param {Object} data Object to feed the modal inner
      */
     generateModalInner = (data) => {
-        if (!data) {
-            console.log("what the???")
-        }
+       
         return `
             <div class="modal-info-container">
                 <img class="modal-img" src="${data.picture.large}" alt="profile picture">
